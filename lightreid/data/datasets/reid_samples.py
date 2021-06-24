@@ -44,7 +44,7 @@ class ReIDSamples:
             pid_num = len(set([sample[1] for sample in samples]))
             '''cid_num = len(set([sample[2] for sample in samples]))'''
             sample_num = len(samples)
-            return sample_num, pid_num, cid_num
+            return sample_num, pid_num
 
         table = PrettyTable([self.__class__.__name__, 'images', 'identities', 'imgs/id'])
         for key, val in kwargs.items():
