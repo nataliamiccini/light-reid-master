@@ -9,7 +9,7 @@ __all__ = [
 
 
 __datasets_factory = {
-    'originalimages ': OriginalImages_ReID
+    'originalimages': OriginalImages_ReID
 }
 
 

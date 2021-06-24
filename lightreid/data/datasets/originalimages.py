@@ -27,7 +27,7 @@ class OriginalImages_ReID(ReIDSamples):
         gallery = self._load_samples(gallery_path)
         
         # init
-        super(Market1501, self).__init__(train, query, gallery, combineall)
+        super(OriginalImages_ReID, self).__init__(train, query, gallery, combineall)
 
     def _load_samples(self, folder_dir):
         '''return (img_path, identity_id, camera_id)'''
