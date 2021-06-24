@@ -18,9 +18,9 @@ class ReIDSamples:
     '''
     An abstract class representing a Re-ID samples.
     Attrs:
-        train (list): contains tuples of (img_path(s), pid, camid).
-        query (list): contains tuples of (img_path(s), pid, camid).
-        gallery (list): contains tuples of (img_path(s), pid, camid).
+        train (list): contains tuples of (img_path(s), pid).
+        query (list): contains tuples of (img_path(s), pid).
+        gallery (list): contains tuples of (img_path(s), pid).
     '''
 
     def __init__(self, train, query, gallery, combineall=False, **kwargs):
@@ -42,23 +42,23 @@ class ReIDSamples:
             if samples is None:
                 return None, None, None
             pid_num = len(set([sample[1] for sample in samples]))
-            cid_num = len(set([sample[2] for sample in samples]))
+            '''cid_num = len(set([sample[2] for sample in samples]))'''
             sample_num = len(samples)
             return sample_num, pid_num, cid_num
 
-        table = PrettyTable([self.__class__.__name__, 'images', 'identities', 'cameras', 'imgs/id', 'imgs/cam', 'imgs/id&cam'])
+        table = PrettyTable([self.__class__.__name__, 'images', 'identities', 'imgs/id'])
         for key, val in kwargs.items():
             if key in ['train', 'query', 'gallery']:
                 info = analyze(val)
                 key_str = str(key)
                 if 'combineall' in kwargs.keys() and kwargs['combineall'] and key == 'train':
                     key_str += '(combineall)'
-                img_num, pid_num, cid_num = info
+                img_num, pid_num = info
                 imgs_per_id = round(img_num / float(pid_num), 2) if img_num is not None else None
-                imgs_per_cam = round(img_num / float(cid_num), 2) if img_num is not None else None
-                imgs_per_idcam = round(img_num / float(pid_num) / float(cid_num), 2) if img_num is not None else None
+               ''' imgs_per_cam = round(img_num / float(cid_num), 2) if img_num is not None else None
+                imgs_per_idcam = round(img_num / float(pid_num) / float(cid_num), 2) if img_num is not None else None'''
                 table.add_row([str(key_str), str(info[0]), str(info[1]), str(info[2]),
-                               str(imgs_per_id), str(imgs_per_cam), str(imgs_per_idcam)])
+                               str(imgs_per_id)])
         print(table)
 
 
