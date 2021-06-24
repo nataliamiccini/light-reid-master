@@ -3,7 +3,7 @@
 
 root_path: '/data/datasets'
 
-market1501:
+originalimages:
   path: '/data/datasets'
   folder: 'originalimages_reID'
   download: True # if dataset not in path, automatically download and extract
