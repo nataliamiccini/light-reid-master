@@ -1,9 +1,9 @@
 # default dataset paths
 # please udpate to your own paths
 
-root_path: '/data/datasets'
+root_path: '/content/light-reid-master'
 
 originalimages:
-  path: '/data/datasets'
+  path: '/content/light-reid-master'
   folder: 'originalimages_reID'
   download: True # if dataset not in path, automatically download and extract
