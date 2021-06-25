@@ -1,7 +1,7 @@
 import os, copy
 from .reid_samples import ReIDSamples
 
-'''img112'''
+'''img1123'''
 class OriginalImages_ReID(ReIDSamples):
    
     dataset_url = 'http://188.138.127.15:81/Datasets/Market-1501-v15.09.15.zip'
