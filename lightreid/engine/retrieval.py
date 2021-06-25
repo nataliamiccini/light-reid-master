@@ -10,21 +10,17 @@ class PersonReIDMAP:
     Test on MarKet and Duke
     '''
 
-    def __init__(self, query_feature, query_cam, query_label, gallery_feature, gallery_cam, gallery_label, dist):
+    def __init__(self, query_feature, query_label, gallery_feature, gallery_label, dist):
         '''
         :param query_feature: np.array, bs * feature_dim
-        :param query_cam: np.array, 1d
         :param query_label: np.array, 1d
         :param gallery_feature: np.array, gallery_size * feature_dim
-        :param gallery_cam: np.array, 1d
         :param gallery_label: np.array, 1d
         '''
 
         self.query_feature = query_feature
-        self.query_cam = query_cam
         self.query_label = query_label
         self.gallery_feature = gallery_feature
-        self.gallery_cam = gallery_cam
         self.gallery_label = gallery_label
 
         assert dist in ['cosine', 'euclidean']
@@ -38,8 +34,8 @@ class PersonReIDMAP:
         APs = []
         CMC = []
         for i in range(len(query_label)):
-            AP, cmc = self.evaluate(self.query_feature[i], self.query_cam[i], self.query_label[i],
-                                    self.gallery_feature, self.gallery_cam, self.gallery_label)
+            AP, cmc = self.evaluate(self.query_feature[i], self.query_label[i],
+                                    self.gallery_feature, self.gallery_label)
             APs.append(AP)
             CMC.append(cmc)
             # print('{}/{}'.format(i, len(query_label)))
@@ -79,13 +75,11 @@ class PersonReIDMAP:
 
         return AP, cmc
 
-    def evaluate(self, query_feature, query_cam, query_label, gallery_feature, gallery_cam, gallery_label):
+    def evaluate(self, query_feature, query_label, gallery_feature, gallery_label):
         '''
         :param query_feature: np.array, 1d
-        :param query_cam: int
         :param query_label: int
         :param gallery_feature: np.array, 2d, gallerys_size * feature_dim
-        :param gallery_cam: np.array, 1d
         :param gallery_label: np.array, 1d
         :return:
         '''
@@ -99,11 +93,11 @@ class PersonReIDMAP:
             score = self.l2(query_feature.reshape([1, -1]), gallery_feature)
             index = np.argsort(score.reshape([-1]))
 
-        junk_index_1 = self.in1d(np.argwhere(query_label == gallery_label), np.argwhere(query_cam == gallery_cam))
+        junk_index_1 = self.in1d(np.argwhere(query_label == gallery_label))
         junk_index_2 = np.argwhere(gallery_label == -1)
         junk_index = np.append(junk_index_1, junk_index_2)
 
-        good_index = self.in1d(np.argwhere(query_label == gallery_label), np.argwhere(query_cam != gallery_cam))
+        good_index = self.in1d(np.argwhere(query_label == gallery_label))
         index_wo_junk = self.notin1d(index, junk_index)
 
         return self.compute_AP(index_wo_junk, good_index)

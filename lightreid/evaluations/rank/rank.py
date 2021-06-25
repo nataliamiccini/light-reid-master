@@ -44,24 +44,21 @@ class CmcMapEvaluator(BaseEvaluator):
     But it takes much more memory.
     Args:
         metric(str): could be cosine, euclidean and hamming
-        mode(str): could be inter-camera, intra-camera and all
-            inter-camera
+        mode(str): could be and all
     '''
 
     def __init__(self, metric, mode):
         assert metric in ['cosine', 'euclidean', 'hamming'], 'expect metric in cosine/euclidean/hamming, but got {}'.format(metric)
-        assert mode in ['inter-camera', 'intra-camera', 'all']
+        assert mode in ['all']
         self.mode = mode
         self.metric = metric
         print(self.metric, self.mode)
 
-    def evaluate(self, query_features, query_camids, query_pids, gallery_features, gallery_camids, gallery_pids):
+    def evaluate(self, query_features, query_pids, gallery_features, gallery_pids):
         '''
         query_features(np.ndarray): [sample_num, feat_dim]
-        query_camids(np.ndarray): [sample_num]
         query_pids(np.ndarray): [sample_num]
         gallery_features(np.ndarray): [sample_num, feat_dim]
-        gallery_camids(np.ndarray): [sample_num]
         gallery_pids(np.ndarray): [sample_num]
         '''
 
@@ -78,9 +75,9 @@ class CmcMapEvaluator(BaseEvaluator):
 
         '''evaluate every query'''
         APs, CMC = [], []
-        for idx, data in enumerate(zip(rank_results, query_camids, query_pids)):
-            a_rank, query_camid, query_pid = data
-            ap, cmc = self.compute_AP(a_rank, query_camid, query_pid, gallery_camids, gallery_pids)
+        for idx, data in enumerate(zip(rank_results, query_pids)):
+            a_rank, query_pid = data
+            ap, cmc = self.compute_AP(a_rank, query_pid, gallery_pids)
             APs.append(ap), CMC.append(cmc)
 
         '''compute CMC and mAP'''
@@ -92,26 +89,10 @@ class CmcMapEvaluator(BaseEvaluator):
         return MAP, CMC
 
 
-    def compute_AP(self, a_rank, query_camid, query_pid, gallery_camids, gallery_pids):
+    def compute_AP(self, a_rank, query_pid, gallery_pids):
         '''given a query and all galleries, compute its ap and cmc'''
 
-        if self.mode == 'inter-camera':
-            junk_index_1 = self.in1d(np.argwhere(query_pid == gallery_pids), np.argwhere(query_camid == gallery_camids))
-            junk_index_2 = np.argwhere(gallery_pids == -1)
-            junk_index = np.append(junk_index_1, junk_index_2)
-            index_wo_junk = self.notin1d(a_rank, junk_index)
-            good_index = self.in1d(np.argwhere(query_pid == gallery_pids), np.argwhere(query_camid != gallery_camids))
-        elif self.mode == 'intra-camera':
-            junk_index_1 = np.argwhere(query_camid != gallery_camids)
-            junk_index_2 = np.argwhere(gallery_pids == -1)
-            junk_index = np.append(junk_index_1, junk_index_2)
-            index_wo_junk = self.notin1d(a_rank, junk_index)
-            good_index = np.argwhere(query_pid == gallery_pids)
-            # self_junk = a_rank[0] if a_rank[0] == 1 or a_rank[0] == 0 else []# remove self
-            self_junk = a_rank[0]
-            index_wo_junk = np.delete(index_wo_junk, np.where(self_junk == index_wo_junk))
-            good_index = np.delete(good_index, np.where(self_junk == good_index))
-        elif self.mode == 'all':
+        if self.mode == 'all':
             junk_index = np.argwhere(gallery_pids == -1)
             index_wo_junk = self.notin1d(a_rank, junk_index)
             good_index = np.argwhere(query_pid == gallery_pids)
@@ -155,19 +136,17 @@ class PreRecEvaluator(BaseEvaluator):
 
     def __init__(self, metric, mode):
         assert metric in ['cosine', 'euclidean']
-        assert mode in ['intra-camera', 'inter-camera', 'all']
+        assert mode in ['all']
         self.metric = metric
         self.mode = mode
 
-    def evaluate(self, query_features, query_camids, query_pids, gallery_features, gallery_camids, gallery_pids):
+    def evaluate(self, query_features, query_pids, gallery_features, gallery_pids):
         '''
         Args:
             thresholds(list):
             query_features(np.ndarray): [sample_num, feat_dim]
-            query_camids(np.ndarray): [sample_num]
             query_pids(np.ndarray): [sample_num]
             gallery_features(np.ndarray): [sample_num, feat_dim]
-            gallery_camids(np.ndarray): [sample_num]
             gallery_pids(np.ndarray): [sample_num]
         '''
 
@@ -182,7 +161,6 @@ class PreRecEvaluator(BaseEvaluator):
             assert 0, 'dist type error'
 
         pid_similarity = (np.expand_dims(query_pids, axis=0).transpose([1,0]) == np.expand_dims(gallery_pids, axis=0)).astype(np.float)
-        cid_similarity = (np.expand_dims(query_camids, axis=0).transpose([1,0]) == np.expand_dims(gallery_camids, axis=0)).astype(np.float)
 
         pres, recalls = [], []
         for threshold in thresholds:
@@ -196,12 +174,6 @@ class PreRecEvaluator(BaseEvaluator):
             if self.mode == 'all':
                 pre = (pid_similarity * hits).sum() / hits.sum()
                 recall = (pid_similarity * hits).sum() / pid_similarity.sum()
-            elif self.mode == 'intra-camera':
-                pre = (pid_similarity * cid_similarity * hits).sum() / (cid_similarity * hits).sum()
-                recall = (pid_similarity * cid_similarity * hits).sum() / (pid_similarity * cid_similarity).sum()
-            elif self.mode == 'inter-camera':
-                pre = (pid_similarity * (1-cid_similarity) * hits).sum() / ((1-cid_similarity) * hits).sum()
-                recall = (pid_similarity * (1-cid_similarity) * hits).sum() / (pid_similarity * (1-cid_similarity)).sum()
             else:
                 assert 0, 'mode type error'
 

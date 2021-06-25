@@ -17,18 +17,16 @@ def make_dirs(dir):
         print('Existed dirs: {}'.format(dir))
 
 
-def visualize_ranked_results(distmat, dataset, save_dir='./vis-results/', sort='ascend', topk=20, mode='inter-camera', show='all'):
+def visualize_ranked_results(distmat, dataset, save_dir='./vis-results/', sort='ascend', topk=20, mode='all', show='all'):
     """Visualizes ranked results.
     Args:
         dismat (numpy.ndarray): distance matrix of shape (nq, ng)
         dataset (tupple): a 2-tuple including (query,gallery), each of which contains
-            tuples of (img_paths, pids, camids)
+            tuples of (img_paths, pids)
         save_dir (str): directory to save output images.
         topk (int, optional): denoting top-k images in the rank list to be visualized.
         sort (string): ascend means small value is similar, otherwise descend
-        mode (string): intra-camera/inter-camera/all
-            intra-camera only visualize results in the same camera with the query
-            inter-camera only visualize results in the different camera with the query
+        mode (string): all
             all visualize all results
         show(string): pos/neg/all
             pos onlu show those true matched images
@@ -45,7 +43,7 @@ def visualize_ranked_results(distmat, dataset, save_dir='./vis-results/', sort='
     assert num_q == len(query)
     assert num_g == len(gallery)
     assert sort in ['ascend', 'descend']
-    assert mode in ['intra-camera', 'inter-camera', 'all']
+    assert mode in ['all']
     assert show in ['pos', 'neg', 'all']
 
     if sort == 'ascend':
@@ -86,7 +84,7 @@ def visualize_ranked_results(distmat, dataset, save_dir='./vis-results/', sort='
         text_list = []
 
         # query image
-        qimg_path, qpid, qcamid = query[q_idx]
+        qimg_path, qpid = query[q_idx]
         image_list.append(qimg_path)
         hit_list.append(True)
         text_list.append(0.0)
@@ -100,12 +98,8 @@ def visualize_ranked_results(distmat, dataset, save_dir='./vis-results/', sort='
         # matched images
         rank_idx = 1
         for ii, g_idx in enumerate(indices[q_idx, :]):
-            gimg_path, gpid, gcamid = gallery[g_idx]
-            if mode == 'intra-camera':
-                valid = qcamid == gcamid
-            elif mode == 'inter-camera':
-                valid = (qpid != gpid and qcamid == gcamid) or (qcamid != gcamid)
-            elif mode == 'all':
+            gimg_path, gpid = gallery[g_idx]
+            if mode == 'all':
                 valid = True
             if valid:
                 if show == 'pos' and qpid != gpid: continue

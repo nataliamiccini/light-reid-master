@@ -37,7 +37,7 @@ class CmcMapEvaluatorC2F:
     def __init__(self, metric, mode):
 
         assert metric in ['hamming'], 'expect hamming, but got {}'.format(metric)
-        assert mode in ['inter-camera', 'intra-camera', 'all'], 'expect inter-camera/intra-camera and all, but got'.format(metric)
+        assert mode in ['all'], 'expect all, but got'.format(metric)
         self.metric = metric
         self.mode = mode
 
@@ -58,7 +58,7 @@ class CmcMapEvaluatorC2F:
         ])
 
 
-    def compute(self, query_feats_list, query_camids, query_pids, gallery_feats_list, gallery_camids, gallery_pids, return_time=False):
+    def compute(self, query_feats_list, query_pids, gallery_feats_list, gallery_pids, return_time=False):
         '''rank and evaluate'''
 
         query_feat_lens = [val.shape[1] for val in query_feats_list]
@@ -108,8 +108,8 @@ class CmcMapEvaluatorC2F:
         for query_idx in self.bar_evaluate(range(len(query_pids))):
             ts = time.time()
             AP, cmc = self.evaluate(
-                query_idx, query_camids, query_pids,
-                gallery_camids, gallery_pids, np.array(all_rank_list[query_idx]))
+                query_idx, query_pids,
+                 gallery_pids, np.array(all_rank_list[query_idx]))
             eval_time_meter.update(time.time()-ts)
             # record
             APs.append(AP); CMC.append(cmc)
@@ -153,13 +153,13 @@ class CmcMapEvaluatorC2F:
         return final_rank_list
 
 
-    def evaluate(self, query_idx, query_cam, query_label, gallery_cam, gallery_label, refined_index):
+    def evaluate(self, query_idx, query_label, gallery_label, refined_index):
         #
-        junk_index_1 = self.in1d(np.argwhere(query_label[query_idx] == gallery_label), np.argwhere(query_cam[query_idx] == gallery_cam))
+        junk_index_1 = self.in1d(np.argwhere(query_label[query_idx] == gallery_label))
         junk_index_2 = np.argwhere(gallery_label == -1)
         junk_index = np.append(junk_index_1, junk_index_2)
         #
-        good_index = self.in1d(np.argwhere(query_label[query_idx] == gallery_label), np.argwhere(query_cam[query_idx] != gallery_cam))
+        good_index = self.in1d(np.argwhere(query_label[query_idx] == gallery_label))
         index_wo_junk = self.notin1d(refined_index, junk_index)
         #
         return self.compute_AP(index_wo_junk, good_index)

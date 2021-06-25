@@ -208,8 +208,8 @@ class Engine(object):
 
         for idx, batch in enumerate(self.datamanager.train_loader):
             # load batch data
-            imgs, pids, camids = batch
-            imgs, pids, camids = imgs.to(self.device), pids.to(self.device), camids.to(self.device)
+            imgs, pids = batch
+            imgs, pids = imgs.to(self.device), pids.to(self.device)
             # forward
             fix_cnn = epoch < self.optimizer.fix_cnn_epochs if hasattr(self, 'fix_cnn_epochs') else False
             res = self.model(imgs, pids, fixcnn=fix_cnn)
@@ -256,21 +256,21 @@ class Engine(object):
 
             # extract features
             time_meter = AverageMeter()
-            query_feats, query_pids, query_camids = self.extract_feats(query_loader, time_meter=time_meter)
-            gallery_feats, gallery_pids, gallery_camids = self.extract_feats(gallery_loader, time_meter=time_meter)
+            query_feats, query_pids = self.extract_feats(query_loader, time_meter=time_meter)
+            gallery_feats, gallery_pids = self.extract_feats(gallery_loader, time_meter=time_meter)
             self.logging('[Feature Extraction] feature extraction time per batch (64) is {}s'.format(time_meter.get_val()))
 
             # compute mAP and rank@k
             mAP, CMC = self.evaluator.evaluate(
-                        query_feats, query_camids, query_pids,
-                        gallery_feats, gallery_camids, gallery_pids)
+                        query_feats, query_pids,
+                        gallery_feats, gallery_pids)
 
             # compute precision-recall curve
             if return_pr:
-                pr_evaluator = PreRecEvaluator(metric=metric, mode='inter-camera')
+                pr_evaluator = PreRecEvaluator(metric=metric, mode='all')
                 pres, recalls, thresholds = pr_evaluator.evaluate(
-                    query_feats, query_camids, query_pids,
-                    gallery_feats, gallery_camids, gallery_pids)
+                    query_feats, query_pids,
+                    gallery_feats, gallery_pids)
                 pr_evaluator.plot_prerecall_curve(self.results_dir, pres, recalls)
 
             # logging
@@ -300,12 +300,12 @@ class Engine(object):
         if mode == 'extract_only' or mode == 'normal':
             for dataset_name, (query_loader, gallery_loader) in self.datamanager.query_gallery_loader_dict.items():
                 time_meter = AverageMeter()
-                query_feats, query_pids, query_camids = self.extract_feats(query_loader, time_meter=time_meter)
-                gallery_feats, gallery_pids, gallery_camids = self.extract_feats(gallery_loader, time_meter=time_meter)
+                query_feats, query_pids = self.extract_feats(query_loader, time_meter=time_meter)
+                gallery_feats, gallery_pids = self.extract_feats(gallery_loader, time_meter=time_meter)
                 self.logging('[Feature Extraction] feature extraction time per batch (64) is {}s'.format(time_meter.get_val()))
                 features = {
-                    'query_feats': query_feats, 'query_pids': query_pids, 'query_camids': query_camids,
-                    'gallery_feats': gallery_feats, 'gallery_pids': gallery_pids, 'gallery_camids': gallery_camids}
+                    'query_feats': query_feats, 'query_pids': query_pids,
+                    'gallery_feats': gallery_feats, 'gallery_pids': gallery_pids}
                 torch.save(features, os.path.join(self.results_dir, '{}_features.pkl'.format(dataset_name)))
 
         # evaluate
@@ -317,36 +317,34 @@ class Engine(object):
                 features = torch.load(os.path.join(self.results_dir, '{}_features.pkl'.format(dataset_name)))
                 query_feats = features['query_feats']
                 query_pids = features['query_pids']
-                query_camids = features['query_camids']
                 gallery_feats = features['gallery_feats']
                 gallery_pids = features['gallery_pids']
-                gallery_camids = features['gallery_camids']
 
                 # # compute mAP and rank@k
                 # if isinstance(query_feats, np.ndarray):  #
                 #     if not onebyone:  # eval all query images one shot
-                #         mAP, CMC = CmcMapEvaluator(metric=metric, mode='inter-camera').evaluate(
-                #             query_feats, query_camids, query_pids,
-                #             gallery_feats, gallery_camids, gallery_pids)
+                #         mAP, CMC = CmcMapEvaluator(metric=metric, mode='all').evaluate(
+                #             query_feats, query_pids,
+                #             gallery_feats, gallery_pids)
                 #     else:  # eval query images one by one
-                #         mAP, CMC, ranktime, evaltime = CmcMapEvaluator1b1(metric=metric, mode='inter-camera').compute(
-                #             query_feats, query_camids, query_pids,
-                #             gallery_feats, gallery_camids, gallery_pids, return_time=True)
+                #         mAP, CMC, ranktime, evaltime = CmcMapEvaluator1b1(metric=metric, mode='all').compute(
+                #             query_feats, query_pids,
+                #             gallery_feats, gallery_pids, return_time=True)
                 # elif isinstance(query_feats, list):  # eval with coarse2fine
-                #     mAP, CMC, ranktime, evaltime = CmcMapEvaluatorC2F(metric=metric, mode='inter-camera').compute(
-                #         query_feats, query_camids, query_pids,
-                #         gallery_feats, gallery_camids, gallery_pids, return_time=True)
+                #     mAP, CMC, ranktime, evaltime = CmcMapEvaluatorC2F(metric=metric, mode='all').compute(
+                #         query_feats, query_pids,
+                #         gallery_feats, gallery_pids, return_time=True)
                 # compute mAP and rank@k
                 mAP, CMC = self.evaluator.evaluate(
-                    query_feats, query_camids, query_pids,
-                    gallery_feats, gallery_camids, gallery_pids)
+                    query_feats, query_pids,
+                    gallery_feats, gallery_pids)
 
                 # compute precision-recall curve
                 if return_pr:
-                    pr_evaluator = PreRecEvaluator(metric=metric, mode='inter-camera')
+                    pr_evaluator = PreRecEvaluator(metric=metric, mode='all')
                     pres, recalls, thresholds = pr_evaluator.evaluate(
-                        query_feats, query_camids, query_pids,
-                        gallery_feats, gallery_camids, gallery_pids)
+                        query_feats, query_pids,
+                        gallery_feats, gallery_pids)
                     pr_evaluator.plot_prerecall_curve(self.results_dir, pres, recalls)
 
                 table.add_row([dataset_name, str(mAP), str(CMC[0]), str(CMC[4]), str(CMC[9])])
@@ -366,8 +364,8 @@ class Engine(object):
         self.set_eval()
 
         for dataset_name, (query_loader, gallery_loader) in self.datamanager.query_gallery_loader_dict.items():
-            query_feats, query_pids, query_camids = self.extract_feats(query_loader)
-            gallery_feats, gallery_pids, gallery_camids = self.extract_feats(gallery_loader)
+            query_feats, query_pids = self.extract_feats(query_loader)
+            gallery_feats, gallery_pids = self.extract_feats(gallery_loader)
             if metric == 'cosine':
                 distmat = skp.cosine_distances(query_feats, gallery_feats) # please note, it is cosine distance not similarity
                 sort = 'ascend'
@@ -386,7 +384,7 @@ class Engine(object):
             output_path = join(self.results_dir, 'visualize/', '{}/'.format(dataset_name))
             visualize_ranked_results(
                 distmat, dataset, save_dir=output_path, sort=sort,
-                topk=20, mode='inter-camera', show='all')
+                topk=20, mode='all', show='all')
 
 
     def extract_feats(self, loader, time_meter=None):
@@ -395,11 +393,11 @@ class Engine(object):
 
         # compute features
         features_meter = None
-        pids_meter, camids_meter = CatMeter(), CatMeter()
+        pids_meter = CatMeter()
         with torch.no_grad():
             for batch in loader:
-                imgs, pids, cids = batch
-                imgs, pids, cids = imgs.to(self.device), pids.to(self.device), cids.to(self.device)
+                imgs, pids = batch
+                imgs, pids = imgs.to(self.device), pids.to(self.device)
                 if time_meter is not None:
                     torch.cuda.synchronize()
                     ts = time.time()
@@ -419,16 +417,16 @@ class Engine(object):
                 else:
                     assert 0
                 pids_meter.update(pids.data)
-                camids_meter.update(cids.data)
+
 
         if isinstance(features_meter, list):
             feats = [val.get_val_numpy() for val in features_meter]
         else:
             feats = features_meter.get_val_numpy()
         pids = pids_meter.get_val_numpy()
-        camids = camids_meter.get_val_numpy()
 
-        return feats, pids, camids
+
+        return feats, pids
 
 
 
@@ -462,8 +460,8 @@ class Engine(object):
 
 #         for idx, batch in enumerate(self.datamanager.train_loader):
 #             # load batch data
-#             imgs, pids, camids = batch
-#             imgs, pids, camids = imgs.to(self.device), pids.to(self.device), camids.to(self.device)
+#             imgs, pids = batch
+#             imgs, pids = imgs.to(self.device), pids.to(self.device)
 #             # forward
 #             fix_cnn = epoch < self.optimizer.fix_cnn_epochs if hasattr(self, 'fix_cnn_epochs') else False
 #             res = self.model(imgs, pids, fixcnn=fix_cnn)

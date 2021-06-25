@@ -55,8 +55,6 @@ class ReIDSamples:
                     key_str += '(combineall)'
                 img_num, pid_num = info
                 imgs_per_id = round(img_num / float(pid_num), 2) if img_num is not None else None
-                ''' imgs_per_cam = round(img_num / float(cid_num), 2) if img_num is not None else None
-                imgs_per_idcam = round(img_num / float(pid_num) / float(cid_num), 2) if img_num is not None else None'''
                 table.add_row([str(key_str), str(info[0]), str(info[1]),
                                str(imgs_per_id)])
         print(table)

@@ -36,7 +36,7 @@ def build_engine(cfg):
     cfg.evaluator = cfg['evaluator'] if 'evaluator' in cfg.keys() else {
         'name': 'cmc_map_eval',
         'metric': 'cosine',
-        'mode': 'inter-camera'
+        'mode': 'all'
     }
     evaluator = build_evaluator(**cfg.evaluator)
 

@@ -11,7 +11,7 @@ class Criterion(object):
             {'criterion': lightreid.losses.TripletLoss(margin=0.3, metric='cosine'), 'weight': 1.0},
         ])
 
-        imgs, pids, camids = data
+        imgs, pids = data
         feats, logits = model(imgs)
         loss = criterion.compute(feats=feats, logits=logits, pids=pids)
     '''
