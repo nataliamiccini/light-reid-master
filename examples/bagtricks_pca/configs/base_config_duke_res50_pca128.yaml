@@ -1,5 +1,5 @@
 env:
-  results_dir: './results/duke/resnet50_pcareduction128'aa
+  results_dir: './results/duke/resnet50_pcareduction128'
   use_gpu: True
   data_parallel: True
   sync_bn: False
