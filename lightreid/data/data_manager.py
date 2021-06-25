@@ -101,13 +101,11 @@ class DataManager(object):
     def combine(self, samples_list):
         '''combine more than one samples (e.g. market.train and duke.train) as a samples'''
         all_samples = []
-        max_pid, max_cid = 0, 0
+        max_pid = 0
         for samples in samples_list:
             for a_sample in samples:
                 img_path = a_sample[0]
                 pid = max_pid + a_sample[1]
-                cid = max_cid + a_sample[2]
-                all_samples.append([img_path, pid, cid])
+                all_samples.append([img_path, pid])
             max_pid = max([sample[1] for sample in all_samples])
-            max_cid = max([sample[2] for sample in all_samples])
         return all_samples
