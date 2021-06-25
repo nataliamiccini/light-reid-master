@@ -134,7 +134,7 @@ class CmcMapEvaluator1b1:
         return MAP, CMC
 
     def rank(self, query_idx, query_features, gallery_features, split_startend_idx=None, pool=None):
-        if self.metric is 'hamming':
+        if self.metric == 'hamming':
             code_len = 4*len(query_features[0])
             if pool is None:
                 _, rank_results = self.hammingsimilarity_countingsort(
@@ -142,10 +142,10 @@ class CmcMapEvaluator1b1:
             else:
                 _, rank_results = self.hammingsimilarity_countingsort_multiprocess(
                     query_features[query_idx], gallery_features, code_len, split_startend_idx, pool)
-        elif self.metric is 'cosine':
+        elif self.metric == 'cosine':
             distance = sk_metrics.pairwise.cosine_distances(np.expand_dims(query_features[query_idx, :], axis=0), gallery_features).squeeze(axis=0)
             rank_results = np.argsort(distance)
-        elif self.metric is 'euclidean':
+        elif self.metric == 'euclidean':
             distance = sk_metrics.pairwise.euclidean_distances(np.expand_dims(query_features[query_idx, :], axis=0), gallery_features).squeeze(axis=0)
             rank_results = np.argsort(distance)
         return rank_results

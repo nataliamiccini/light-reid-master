@@ -44,7 +44,7 @@ class ReIDSamples:
             pid_num = len(set([sample[1] for sample in samples]))
             '''cid_num = len(set([sample[2] for sample in samples]))'''
             sample_num = len(samples)
-            return sample_num, pid_num, cid_num
+            return sample_num, pid_num
 
         table = PrettyTable([self.__class__.__name__, 'images', 'identities', 'imgs/id'])
         for key, val in kwargs.items():
@@ -55,10 +55,8 @@ class ReIDSamples:
                     key_str += '(combineall)'
                 img_num, pid_num = info
                 imgs_per_id = round(img_num / float(pid_num), 2) if img_num is not None else None
-               ''' imgs_per_cam = round(img_num / float(cid_num), 2) if img_num is not None else None
-                imgs_per_idcam = round(img_num / float(pid_num) / float(cid_num), 2) if img_num is not None else None'''
-                table.add_row([str(key_str), str(info[0]), str(info[1]), str(info[2]),
-                               str(imgs_per_id)])
+
+                table.add_row([str(key_str), str(info[0]),str(info[1]),str(imgs_per_id)])
         print(table)
 
 
