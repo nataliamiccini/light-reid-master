@@ -1,9 +1,9 @@
 # default dataset paths
 # please udpate to your own paths
 
-root_path: 'C:\Users\HEW15CS3067NL\Desktop\cv\originalimages_reID'
+root_path: 'C:\Users\User\Desktop\Magistrale\CV\database\Nostro'
 
 originalimages:
-  path: 'C:\Users\HEW15CS3067NL\Desktop\cv\originalimages_reID'
+  path: 'C:\Users\User\Desktop\Magistrale\CV\database\Nostro'
   folder: 'originalimages_reID'
   download: True # if dataset not in path, automatically download and extract

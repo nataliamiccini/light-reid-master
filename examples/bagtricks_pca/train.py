@@ -2,7 +2,6 @@ import argparse, ast
 import sys
 sys.path.append('../..')
 sys.path.append('.')
-import torch
 import lightreid
 import yaml
 import time
@@ -17,7 +16,6 @@ with open(args.config_file) as file:
     config = yaml.load(file, Loader=yaml.FullLoader)
 # init solver
 solver = lightreid.build_engine(config)
-
 # train
 solver.train(eval_freq=10)
 # test

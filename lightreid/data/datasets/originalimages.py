@@ -1,4 +1,4 @@
-import os, copy
+import os
 from .reid_samples import ReIDSamples
 
 '''img1123'''

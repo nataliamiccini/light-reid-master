@@ -1,11 +1,10 @@
 from .originalimages import OriginalImages_ReID
 
 import yaml
-from os.path import realpath, dirname, join
+from os.path import dirname, join
 
 
-__all__ = [
-    'build_train_dataset', 'build_test_dataset']
+__all__ = ['build_train_dataset', 'build_test_dataset']
 
 
 __datasets_factory = {
