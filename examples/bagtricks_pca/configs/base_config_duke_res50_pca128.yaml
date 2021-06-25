@@ -1,5 +1,7 @@
 env:
+
   results_dir: './results/duke/resnet50_pcareduction128' '''abcdefd'''
+
   use_gpu: True
   data_parallel: True
   sync_bn: False
@@ -10,8 +12,9 @@ lightreid:
   light_search: False
 
 data:
-  sources: ['originalimages']
-  targets: ['originalimages']
+
+  sources: ['originalimages_reID']
+  targets: ['originalimages_reID']
   img_size: [256, 128] # height, width
   transforms_train: ['randomflip', 'padcrop', 'rea']
   transforms_test: []
