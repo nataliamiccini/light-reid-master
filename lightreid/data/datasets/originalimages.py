@@ -1,7 +1,7 @@
 import os, copy
 from .reid_samples import ReIDSamples
 
-
+'''img1123'''
 class OriginalImages_ReID(ReIDSamples):
    
     dataset_url = 'http://188.138.127.15:81/Datasets/Market-1501-v15.09.15.zip'
@@ -27,7 +27,7 @@ class OriginalImages_ReID(ReIDSamples):
         gallery = self._load_samples(gallery_path)
         
         # init
-        super(Market1501, self).__init__(train, query, gallery, combineall)
+        super(OriginalImages_ReID, self).__init__(train, query, gallery, combineall)
 
     def _load_samples(self, folder_dir):
         '''return (img_path, identity_id, camera_id)'''

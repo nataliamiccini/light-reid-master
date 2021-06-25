@@ -9,5 +9,4 @@ gdown
 progressbar2
 pyyaml
 hexhamming==1.1
-apex
 opencv-python

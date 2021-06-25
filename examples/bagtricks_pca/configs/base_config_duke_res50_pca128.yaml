@@ -1,5 +1,7 @@
 env:
-  results_dir: './results/duke/resnet50_pcareduction128'aa
+
+  results_dir: './results/duke/resnet50_pcareduction128' '''abcdefd'''
+
   use_gpu: True
   data_parallel: True
   sync_bn: False
@@ -10,6 +12,7 @@ lightreid:
   light_search: False
 
 data:
+
   sources: ['originalimages_reID']
   targets: ['originalimages_reID']
   img_size: [256, 128] # height, width
@@ -67,5 +70,5 @@ optim:
     gamma: 0.1
     warmup_factor: 0.01
     warmup_epochs: 10
-  max_epochs: 120
+  max_epochs: 2
 

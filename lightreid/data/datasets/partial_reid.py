@@ -31,7 +31,7 @@ class PartialReID(ReIDSamples):
         for line in f.readlines():
             line = line.replace('\n', '')
             image_path = line
-            pid = int(line.split('/')[1].replace('.jpg', '').split('_')[0])
+            pid = int(line.split('/')[1].replace('.jpg', '').split('-')[0])
             samples.append([os.path.join(data_path, image_path), pid, 0])
         return samples
 
@@ -49,6 +49,6 @@ class PartialReID(ReIDSamples):
         for line in f.readlines():
             line = line.replace('\n', '')
             image_path = line
-            pid = int(line.split('/')[1].replace('.jpg', '').split('_')[0])
+            pid = int(line.split('/')[1].replace('.jpg', '').split('-')[0])
             samples.append([os.path.join(data_path, image_path), pid, 1])
         return samples

@@ -1,9 +1,9 @@
 # default dataset paths
 # please udpate to your own paths
 
-root_path: '/data/datasets'
+root_path: 'C:\Users\HEW15CS3067NL\Desktop\cv\originalimages_reID'
 
-market1501:
-  path: '/data/datasets'
+originalimages:
+  path: 'C:\Users\HEW15CS3067NL\Desktop\cv\originalimages_reID'
   folder: 'originalimages_reID'
   download: True # if dataset not in path, automatically download and extract
