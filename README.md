@@ -92,5 +92,5 @@ if you find the repo is useful, please kindly cite our works
  author="Guan'an {Wang} and Shuo {Yang} and Huanyu {Liu} and Zhicheng {Wang} and Yang {Yang} and Shuliang {Wang} and Gang {Yu} and Erjin {Zhou} and Jian {Sun}",
  journal="In Proceedings of the 2020 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
  year="2020"
-}
+}.
 ```
